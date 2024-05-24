@@ -27,6 +27,6 @@ model Subject {
   name    String
   credits   Int
   semester Int
-  student    Student    @relation(fields: [studentId], references: [id])
-  studentId  Int
+  student    Student    @relation(fields: [nim], references: [nim])
+  nim  String
 }

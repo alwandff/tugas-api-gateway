@@ -68,3 +68,25 @@
 .form-container button:hover {
     background-color: #45a049;
 }
+
+/* styles.css */
+.margin-top{
+    margin-top: 10px; /* Adjust the value as needed */
+  }
+
+  .margin-bot{
+    margin-bottom: 15px;
+  }
+  
+  .select-label {
+    display: block;
+    margin-bottom: 8px;
+  }
+  
+  .select-nim {
+    width: 100%;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+  

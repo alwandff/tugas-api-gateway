@@ -58,10 +58,12 @@ const Student = () => {
         const { message } = response.data;
         fetchStudents();
         alert(message);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       } catch (error) {
         if (error.response && error.response.data && error.response.data.message) {
           setErrorMessage(error.response.data.message);
           setIsVisible(true);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
           console.error('Error updating student:', error);
         }
@@ -74,11 +76,13 @@ const Student = () => {
         setStudents((prevStudents) => [...prevStudents, result]);
         // Tampilkan pesan dari backend
         alert(message);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       } catch (error) {
         console.log(error)
         if (error.response && error.response.data && error.response.data.message) {
           setErrorMessage(error.response.data.message);
           setIsVisible(true);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
           console.error('Error adding student:', error);
         }

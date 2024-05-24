@@ -9,6 +9,20 @@ const prisma = new PrismaClient();
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));    
 
+
+app.get('/nim', async (req, res) => {
+    try {
+      const students = await prisma.student.findMany({
+        select: {
+          nim: true,
+        },
+      });
+      res.json(students);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+});
+
 app.get("/", async (req, res) => {
     try {
         const students = await prisma.student.findMany();
@@ -218,6 +232,8 @@ app.delete("/:id", async (req, res) => {
         await prisma.$disconnect();
     }
 })
+
+
 
 app.listen(port, () => {
     console.log(`Student service listening on port ${port}`);

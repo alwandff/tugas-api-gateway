@@ -21,8 +21,8 @@ app.get("/", async (req, res) => {
     }
 })
 app.post("/", async (req, res) => {
-    const { name, credits, semester, studentId } = req.body;
-    if (!name || !credits || !semester || !studentId) {
+    const { name, credits, semester, nim } = req.body;
+    if (!name || !credits || !semester || !nim) {
         return res.status(400).send({
             error: true,
             message: "Ada data yang belum diisi"
@@ -30,12 +30,39 @@ app.post("/", async (req, res) => {
     }
 
     try {
+        const studentIsExist = await prisma.student.findUnique({
+            where:{
+                nim: nim
+            }
+        })
+
+        if(!studentIsExist){
+            return res.status(404).send({
+                error: true,
+                message: "Mahasiswa tidak ditemukan"
+            })
+        }
+
+        const subjectIsExist = await prisma.subject.findMany({
+            where: {
+                name: name,
+                nim: nim
+            }
+        })
+
+        if(subjectIsExist.length > 0){
+            return res.status(400).send({
+                error: true,
+                message: "Mata kuliah sudah ditambahkan, silahkan masukkan mata kuliah lain."
+            });
+        }
+
         const newSubject = await prisma.subject.create({
             data: {
                 name: name,
-                credits: parseInt(credits, 10),
-                semester: parseInt(semester, 10),
-                studentId: parseInt(studentId, 10)
+                credits: parseInt(credits),
+                semester: parseInt(semester),
+                nim: nim
             }
         });
         return res.status(201).send({
@@ -54,11 +81,11 @@ app.post("/", async (req, res) => {
 });
 
 app.get("/:id", async (req, res) => {
-    const studentId = parseInt(req.params.id);
+    const subjectId = parseInt(req.params.id);
     try {
         const subject = await prisma.subject.findUnique({
             where: {
-                id: studentId
+                id: subjectId
             }
         })
         if(!subject){
@@ -79,7 +106,7 @@ app.get("/:id", async (req, res) => {
 })
 
 app.put("/:id", async (req, res) => {
-    const studentId = parseInt(req.params.id);
+    const subjectId = parseInt(req.params.id);
     const { credits, semester } = req.body;
     if (!credits || !semester) {
         return res.status(400).send({
@@ -91,7 +118,7 @@ app.put("/:id", async (req, res) => {
     try {
         const subject = await prisma.subject.findUnique({
             where: {
-                id: studentId
+                id: subjectId
             }
         })
         if(!subject){
@@ -104,11 +131,11 @@ app.put("/:id", async (req, res) => {
 
         await prisma.subject.update({
             where: {
-                id: studentId
+                id: subjectId
             },
             data: {
-                credits: credits,
-                semester: semester
+                credits: parseInt(credits),
+                semester: parseInt(semester)
             }
         })
         return res.status(200).send({
@@ -126,11 +153,11 @@ app.put("/:id", async (req, res) => {
 })
 
 app.delete("/:id", async (req, res) => {
-    const studentId = parseInt(req.params.id);
+    const subjectId = parseInt(req.params.id);
     try {
         const subject = await prisma.subject.findUnique({
             where: {
-                id: studentId
+                id: subjectId
             }
         })
         if(!subject){
@@ -142,7 +169,7 @@ app.delete("/:id", async (req, res) => {
 
         await prisma.subject.delete({
             where: {
-                id: studentId
+                id: subjectId
             }
         })
 

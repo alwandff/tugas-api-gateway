@@ -4,12 +4,12 @@ import { axiosInstance } from "../lib/axios";
 
 const Subject = () => {
     const [subjects, setSubjects] = useState([]);
-    const [formData, setFormData] = useState({ id: '', name: '', credits: '', semester: '', studentId: '' });
+    const [formData, setFormData] = useState({ id: '', name: '', credits: '', semester: '', nim: '' });
     const [errorMessage, setErrorMessage] = useState('');
     const [isVisible, setIsVisible] = useState(true);
+    const [nims, setNims] = useState([]);
   
     const fetchSubjects = async () => {
-      
       try {
         const subjectsResponse = await axiosInstance.get("/subjects");
         setSubjects(subjectsResponse.data);
@@ -17,9 +17,19 @@ const Subject = () => {
       console.log(error);
       }
     };
+
+    const fetchNims = async () => {
+      try {
+        const response = await axiosInstance.get('/students/nim');
+        setNims(response.data);
+      } catch (error) {
+        console.error('Error fetching NIMs:', error);
+      }
+    }
   
     useEffect(() => {
-        fetchSubjects()
+        fetchSubjects();
+        fetchNims();
     }, [])
   
     const renderSubjects = () => {
@@ -30,7 +40,7 @@ const Subject = () => {
             <td>{subject.name}</td>
             <td>{subject.credits}</td>
             <td>{subject.semester}</td>
-            <td>{subject.studentId}</td>
+            <td>{subject.nim}</td>
             <td>  
               <button className="button button-edit" onClick={() => handleEditClick(subject)}>Edit</button>
               <button className="button button-delete" onClick={() => handleDeleteClick(subject.id)}>Delete</button>
@@ -58,10 +68,12 @@ const Subject = () => {
           const { message } = response.data;
           fetchSubjects();
           alert(message);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (error) {
           if (error.response && error.response.data && error.response.data.message) {
             setErrorMessage(error.response.data.message);
             setIsVisible(true);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
           } else {
             console.error('Error updating subject:', error);
           }
@@ -74,17 +86,19 @@ const Subject = () => {
           setSubjects((prevSubjects) => [...prevSubjects, result]);
           // Tampilkan pesan dari backend
           alert(message);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (error) {
           console.log(error)
           if (error.response && error.response.data && error.response.data.message) {
             setErrorMessage(error.response.data.message);
             setIsVisible(true);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
           } else {
             console.error('Error adding subject:', error);
           }
         }
       }
-      setFormData({ id: '', name: '', credits: '', semester: '', studentId: '' });
+      setFormData({ id: '', name: '', credits: '', semester: '', nim: '' });
     };
   
     const handleEditClick = (subject) => {
@@ -126,7 +140,7 @@ const Subject = () => {
                   <th>Name</th>
                   <th>Credits</th>
                   <th>Semester</th>
-                  <th>StudentId</th>
+                  <th>NIM</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -152,13 +166,12 @@ const Subject = () => {
                 />
               </div>
               <div>
-                <label>Credit</label>
+                <label>Credits</label>
                 <input
                   type="number"
                   name="credits"
                   value={formData.credits}
                   onChange={handleInputChange}
-                  disabled={!!formData.id}
                 />
               </div>
               <div>
@@ -170,14 +183,22 @@ const Subject = () => {
                   onChange={handleInputChange}
                 />
               </div>
-              <div>
-                <label>StudentId</label>
-                <input
-                  type="number"
-                  name="studentId"
-                  value={formData.studentId}
+              <div className='margin-top margin-bot'>
+                <label className='select-label'>NIM</label>
+                <select
+                  name="nim"
+                  value={formData.nim}
                   onChange={handleInputChange}
-                />
+                  disabled={!!formData.id}
+                  className='select-nim'
+                >
+                  <option value="">Select NIM</option>
+                  {nims.map((student) => (
+                    <option key={student.nim} value={student.nim}>
+                      {student.nim}
+                    </option>
+                  ))}
+                </select>
               </div>
               <button type="submit">{formData.id ? 'Update' : 'Add'}</button>
             </form>
