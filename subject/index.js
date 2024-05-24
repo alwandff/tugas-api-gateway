@@ -33,9 +33,9 @@ app.post("/", async (req, res) => {
         const newSubject = await prisma.subject.create({
             data: {
                 name: name,
-                credits: credits,
-                semester: semester,
-                studentId: studentId
+                credits: parseInt(credits, 10),
+                semester: parseInt(semester, 10),
+                studentId: parseInt(studentId, 10)
             }
         });
         return res.status(201).send({
@@ -54,11 +54,11 @@ app.post("/", async (req, res) => {
 });
 
 app.get("/:id", async (req, res) => {
-    const subjectId = parseInt(req.params.id);
+    const studentId = parseInt(req.params.id);
     try {
         const subject = await prisma.subject.findUnique({
             where: {
-                id: subjectId
+                id: studentId
             }
         })
         if(!subject){
@@ -79,7 +79,7 @@ app.get("/:id", async (req, res) => {
 })
 
 app.put("/:id", async (req, res) => {
-    const subjectId = parseInt(req.params.id);
+    const studentId = parseInt(req.params.id);
     const { credits, semester } = req.body;
     if (!credits || !semester) {
         return res.status(400).send({
@@ -91,7 +91,7 @@ app.put("/:id", async (req, res) => {
     try {
         const subject = await prisma.subject.findUnique({
             where: {
-                id: subjectId
+                id: studentId
             }
         })
         if(!subject){
@@ -104,7 +104,7 @@ app.put("/:id", async (req, res) => {
 
         await prisma.subject.update({
             where: {
-                id: subjectId
+                id: studentId
             },
             data: {
                 credits: credits,
@@ -126,11 +126,11 @@ app.put("/:id", async (req, res) => {
 })
 
 app.delete("/:id", async (req, res) => {
-    const subjectId = parseInt(req.params.id);
+    const studentId = parseInt(req.params.id);
     try {
         const subject = await prisma.subject.findUnique({
             where: {
-                id: subjectId
+                id: studentId
             }
         })
         if(!subject){
@@ -142,7 +142,7 @@ app.delete("/:id", async (req, res) => {
 
         await prisma.subject.delete({
             where: {
-                id: subjectId
+                id: studentId
             }
         })
 

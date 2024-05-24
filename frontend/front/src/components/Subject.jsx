@@ -1,39 +1,39 @@
 import React, { useState, useEffect } from 'react';
-import './Student.css';
+import './Subject.css';
 import { axiosInstance } from "../lib/axios";
 
 const Subject = () => {
-    const [students, setStudents] = useState([]);
-    const [formData, setFormData] = useState({ id: '', nim: '', name: '', email: '', telp: '' });
+    const [subjects, setSubjects] = useState([]);
+    const [formData, setFormData] = useState({ id: '', name: '', credits: '', semester: '', studentId: '' });
     const [errorMessage, setErrorMessage] = useState('');
     const [isVisible, setIsVisible] = useState(true);
   
-    const fetchStudents = async () => {
+    const fetchSubjects = async () => {
       
       try {
-        const studentsResponse = await axiosInstance.get("/students");
-        setStudents(studentsResponse.data);
+        const subjectsResponse = await axiosInstance.get("/subjects");
+        setSubjects(subjectsResponse.data);
       } catch (error) {
       console.log(error);
       }
     };
   
     useEffect(() => {
-        fetchStudents()
+        fetchSubjects()
     }, [])
   
-    const renderStudents = () => {
-      return students.map((student) => {
+    const renderSubjects = () => {
+      return subjects.map((subject) => {
         return (
-          <tr key={student.id}>
-            <td>{student.id}</td>
-            <td>{student.nim}</td>
-            <td>{student.name}</td>
-            <td>{student.email}</td>
-            <td>{student.telp}</td>
+          <tr key={subject.id}>
+            <td>{subject.id}</td>
+            <td>{subject.name}</td>
+            <td>{subject.credits}</td>
+            <td>{subject.semester}</td>
+            <td>{subject.studentId}</td>
             <td>  
-              <button className="button button-edit" onClick={() => handleEditClick(student)}>Edit</button>
-              <button className="button button-delete" onClick={() => handleDeleteClick(student.id)}>Delete</button>
+              <button className="button button-edit" onClick={() => handleEditClick(subject)}>Edit</button>
+              <button className="button button-delete" onClick={() => handleDeleteClick(subject.id)}>Delete</button>
             </td>
           </tr>
         )
@@ -51,27 +51,27 @@ const Subject = () => {
       if (formData.id) {
         // Penanganan untuk update data
         try {
-          const response = await axiosInstance.put(`/students/${formData.id}`, {
-            email: formData.email,
-            telp: formData.telp
+          const response = await axiosInstance.put(`/subjects/${formData.id}`, {
+            credits: formData.credits,
+            semester: formData.semester
           });
           const { message } = response.data;
-          fetchStudents();
+          fetchSubjects();
           alert(message);
         } catch (error) {
           if (error.response && error.response.data && error.response.data.message) {
             setErrorMessage(error.response.data.message);
             setIsVisible(true);
           } else {
-            console.error('Error updating student:', error);
+            console.error('Error updating subject:', error);
           }
         }
       } else {
         // Penanganan untuk tambah data baru
         try {
-          const response = await axiosInstance.post('/students', formData);
+          const response = await axiosInstance.post('/subjects', formData);
           const { message, result } = response.data;
-          setStudents((prevStudents) => [...prevStudents, result]);
+          setSubjects((prevSubjects) => [...prevSubjects, result]);
           // Tampilkan pesan dari backend
           alert(message);
         } catch (error) {
@@ -80,26 +80,26 @@ const Subject = () => {
             setErrorMessage(error.response.data.message);
             setIsVisible(true);
           } else {
-            console.error('Error adding student:', error);
+            console.error('Error adding subject:', error);
           }
         }
       }
-      setFormData({ id: '', nim: '', name: '', email: '', telp: '' });
+      setFormData({ id: '', name: '', credits: '', semester: '', studentId: '' });
     };
   
-    const handleEditClick = (student) => {
-      setFormData(student);
+    const handleEditClick = (subject) => {
+      setFormData(subject);
     };
   
     const handleDeleteClick = async (id) => {
       try {
-        const response = await axiosInstance.delete(`/students/${id}`);
+        const response = await axiosInstance.delete(`/subjects/${id}`);
         const { message } = response.data;
-        setStudents((prevStudents) => prevStudents.filter((student) => student.id !== id));
+        setSubjects((prevSubjects) => prevSubjects.filter((subject) => subject.id !== id));
         // Tampilkan notifikasi atau pesan yang sesuai dengan respons dari backend
         alert(message);
       } catch (error) {
-        console.error('Error deleting student:', error);
+        console.error('Error deleting subject:', error);
       }
     };
   
@@ -108,6 +108,8 @@ const Subject = () => {
     };
   
     return (
+
+
       <div>
         <div className="columns mt-5 is-centered">
           <div className="column is-half">
@@ -121,15 +123,15 @@ const Subject = () => {
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>NIM</th>
                   <th>Name</th>
-                  <th>Email</th>
-                  <th>Telephone</th>
+                  <th>Credits</th>
+                  <th>Semester</th>
+                  <th>StudentId</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {renderStudents()}
+                {renderSubjects()}
               </tbody>
             </table>
           </div>
@@ -139,16 +141,6 @@ const Subject = () => {
           <div className="column is-half">
             <form className="form-container" onSubmit={handleFormSubmit}>
               <input type="hidden" name="id" value={formData.id} />
-              <div>
-                <label>NIM</label>
-                <input
-                  type="text"
-                  name="nim"
-                  value={formData.nim}
-                  onChange={handleInputChange}
-                  disabled={!!formData.id}
-                />
-              </div>
               <div>
                 <label>Name</label>
                 <input
@@ -160,20 +152,30 @@ const Subject = () => {
                 />
               </div>
               <div>
-                <label>Email</label>
+                <label>Credit</label>
                 <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
+                  type="number"
+                  name="credits"
+                  value={formData.credits}
+                  onChange={handleInputChange}
+                  disabled={!!formData.id}
+                />
+              </div>
+              <div>
+                <label>Semester</label>
+                <input
+                  type="number"
+                  name="semester"
+                  value={formData.semester}
                   onChange={handleInputChange}
                 />
               </div>
               <div>
-                <label>Telephone</label>
+                <label>StudentId</label>
                 <input
-                  type="text"
-                  name="telp"
-                  value={formData.telp}
+                  type="number"
+                  name="studentId"
+                  value={formData.studentId}
                   onChange={handleInputChange}
                 />
               </div>
